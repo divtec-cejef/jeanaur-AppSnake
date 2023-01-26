@@ -2,17 +2,105 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/main_activity"
     tools:context=".MainActivity">
 
-    <com.example.testsnake.GameView
+    <com.example.appsnake.GameView
         android:id="@+id/ghost_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
+
+    <TextView
+        android:id="@+id/txt_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="0"
+        android:textColor="#FF000000"
+        android:textSize="50sp" />
+    <Button
+        android:id="@+id/btn_start_game"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#FF000000"
+        android:fontFamily="monospace"
+        android:padding="10dp"
+        android:text="Start"
+        android:textSize="18sp" />
+
+
+    <RelativeLayout
+        android:id="@+id/rl_game_over"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#868686"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_game_over"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="cursive"
+            android:text="Game Over"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="60sp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="35dp"
+            tools:ignore="MissingConstraints" />
+
+        <EditText
+            android:id="@+id/txt_pseudo"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="Saisir votre pseudo"
+            android:layout_marginTop="150dp"
+            android:layout_marginLeft="230dp"/>
+
+        <Button
+            android:id="@+id/bt_restart"
+            android:layout_width="119dp"
+            android:layout_height="33dp"
+            android:background="#509DA6"
+            android:fontFamily="monospace"
+            android:text="Restart"
+            android:textSize="14sp"
+            android:layout_marginTop="270dp"
+            android:layout_marginLeft="470dp"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/bt_save"
+            android:layout_width="119dp"
+            android:layout_height="33dp"
+            android:background="#509DA6"
+            android:fontFamily="monospace"
+            android:text="Sauvegarder"
+            android:textSize="14sp"
+            android:layout_marginTop="170dp"
+            android:layout_marginLeft="520dp"
+            tools:ignore="MissingConstrants" />
+
+        <Button
+            android:id="@+id/bt_quitter"
+            android:layout_width="119dp"
+            android:layout_height="33dp"
+            android:background="#509DA6"
+            android:fontFamily="monospace"
+            android:text="Quitter"
+            android:textSize="14sp"
+            android:layout_marginTop="270dp"
+            android:layout_marginLeft="190dp"
+            tools:ignore="MissingConstrants" />
+    </RelativeLayout>
 </RelativeLayout>

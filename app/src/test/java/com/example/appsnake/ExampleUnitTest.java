@@ -1,4 +1,4 @@
-package com.example.testsnake;
+package com.example.appsnake;
 
 import org.junit.Test;
 

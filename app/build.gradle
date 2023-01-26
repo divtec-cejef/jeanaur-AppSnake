@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.testsnake'
+    namespace 'com.example.appsnake'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.testsnake"
+        applicationId "com.example.appsnake"
         minSdk 25
         targetSdk 33
         versionCode 1

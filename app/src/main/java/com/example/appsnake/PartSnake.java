@@ -1,4 +1,4 @@
-package com.example.testsnake;
+package com.example.appsnake;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -7,13 +7,22 @@ public class PartSnake {
 
     private Bitmap bitmap;
     private int x, y;
+    // Partie du corps du snake, corps, le haut, le bas, la gauche et la droite
     private Rect rBody, rTop, rBottom, rLeft, rRight;
 
+    /**
+     * Constructeur de la classe "PartSnake"
+     * @param bitmap image à créer
+     * @param x la position de l'image sur l'axe x
+     * @param y la position de l'image sur l'axe y
+     */
     public PartSnake(Bitmap bitmap, int x, int y) {
         this.bitmap = bitmap;
         this.x = x;
         this.y = y;
     }
+
+    // Instanciation des getter et setter
 
     public Bitmap getBitmap() {
         return bitmap;

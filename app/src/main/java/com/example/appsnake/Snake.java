@@ -1,51 +1,40 @@
-package com.example.testsnake;
+package com.example.appsnake;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.view.SurfaceView;
 
 import java.util.ArrayList;
 
-public class Snake {//extends SurfaceView {
+public class Snake {
 
-    // Fil jeu pour la boucle principale
-    //private Thread thread = null;
-
-    // Référence à l'activité
-    //private Context context;
-
-    // Suivi des mouvements d'orientation du snake
-    //public enum Heading {UP, RIGHT, DOWN, LEFT}
-
-    // Commencer par se diriger vers la droite
-    //private Heading heading = Heading.RIGHT;
-
-    // Contrôle des pauses entre les mises à jour
-    //private long nextFrameTime;
-
-    // Configuration de la prochaine mise à jour
-    // Update le jeux toutes les 10 s
-    //private long timeUpdateGame = 10;
-
-    // Il y a 1000 millisecondes dans une seconde.
-    //private long MILLIS_PER_SECOND = 1000;
-
-    // Variable de vérification si le jeux est en cours
-    //private volatile boolean isPlaying;
-
+    // Variable de vérification si le snake bouge à gauche, droite, haut ou bas
     private boolean move_left, move_right, move_up, move_down;
+
+    // Les différentes partie du snake
     private Bitmap bm, bm_head_up, bm_head_down, bm_head_left, bm_head_right, bm_body_vertical, bm_body_horizontal,
             bm_body_top_right, bm_body_top_left, bm_body_bottom_right, bm_body_bottom_left, bm_tail_right, bm_tail_left,
             bm_tail_up, bm_tail_down;
+
+    // La position x et y du snake + sa longueur
     private int x, y, length;
+
+    // Liste des parties du snake
     private ArrayList<PartSnake> arrPartSnake = new ArrayList<>();
 
+    /**
+     * Constructeur de la classe "Snake"
+     * @param bm bitmap
+     * @param x la position x
+     * @param y la position y
+     * @param length la longueur du snake
+     */
     public Snake(Bitmap bm, int x, int y, int length) {
         this.bm = bm;
         this.x = x;
         this.y = y;
         this.length = length;
+
+        //Instancie les valeurs des différentes parties du corps du snake
         bm_body_bottom_left = Bitmap.createBitmap(bm, 0, 0, GameView.sizeOfMap, GameView.sizeOfMap);
         bm_body_bottom_right = Bitmap.createBitmap(bm, GameView.sizeOfMap, 0, GameView.sizeOfMap, GameView.sizeOfMap);
         bm_body_horizontal = Bitmap.createBitmap(bm, 2 * GameView.sizeOfMap, 0, GameView.sizeOfMap, GameView.sizeOfMap);
@@ -70,6 +59,9 @@ public class Snake {//extends SurfaceView {
                 - GameView.sizeOfMap, y));
     }
 
+    /**
+     * Méthode appelé lorsque l'on fait une mise à jour du jeux
+     */
     public void update() {
         for (int i = length -1; i > 0; i--) {
             arrPartSnake.get(i).setX(arrPartSnake.get(i-1).getX());
@@ -162,11 +154,18 @@ public class Snake {//extends SurfaceView {
 
     }
 
+    /**
+     * Méthode appelé lorsque l'on souhaite dessiner le snake
+     * @param canvas ce que l'on a besoin pour dessiner
+     */
     public void drawSnake(Canvas canvas){
         for(int i = length-1; i >= 0; i--){
             canvas.drawBitmap(arrPartSnake.get(i).getBitmap(), arrPartSnake.get(i).getX(), arrPartSnake.get(i).getY(), null);
         }
     }
+
+
+    // Instanciation des getters et setters
 
     public Bitmap getBm() {
         return bm;
@@ -363,6 +362,9 @@ public class Snake {//extends SurfaceView {
         this.move_down = false;
     }
 
+    /**
+     * Méthode appelé lorsque l'on souhaite ajouter une partie au snake
+     */
     public void addPart() {
         PartSnake partSnake = this.arrPartSnake.get(length -1);
         this.length += 1;

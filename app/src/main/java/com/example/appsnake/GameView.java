@@ -1,7 +1,6 @@
-package com.example.testsnake;
+package com.example.appsnake;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,32 +12,58 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.LogRecord;
 
 public class GameView extends View {
-
+    // Création variable
+    // Création des Bitmap pour l'herbe, le snake et la pomme
     private Bitmap bmGrass1, bmGrass2, bmSnake, bmApple;
+    // Taille de la map sur le téléphone
     public static int sizeOfMap = 70 * Constants.SCREEN_WIDTH / 1080;
+    // Définir le nombre d'images que l'on souhaite en hauteur et en largeur
     private int h = 7, w = 16;
+    // Liste qui s'occupe de stocker nos images pour créer la map
     private ArrayList<Grass> arrGrass = new ArrayList<>();
+    // Variable snake
     private Snake snake;
+    // Variable de vérification si le snake bouge.
     private boolean move = false;
+    // Variable mx = que le serpent bouge sur l'axe x
+    // Variable my = que le serpent bouge sur l'axe y
     private float mx, my;
+    // Création handler
     private android.os.Handler handler;
+    // Création runnable
     private Runnable runnable;
-
+    // Variable pomme
     private Apple apple;
+    // Variable de vérification si le jeux est en jeux.
     public static boolean isPlaying = false;
     private Context context;
+    // Variable qui s'occupe du score
+    private int score;
+    // Variable de vérification si le bouton "Start" est clické
+    private boolean start = false;
 
+    /**
+     * Constructeur
+     *
+     * @param context      Context qui est utilisé
+     * @param attributeSet Les attributs
+     */
     public GameView(Context context, @Nullable AttributeSet attributeSet) {
         super(context, attributeSet);
         this.context = context;
-
+        // Enregistrement du score pour pouvoir le réutiliser plus tard
+        SharedPreferences sharedPreferences = context.getSharedPreferences("gamesetting", Context.MODE_PRIVATE);
+        if (sharedPreferences != null) {
+            score = sharedPreferences.getInt("score", 0);
+        }
+        start = false;
+        // S'occupe de créer la map
+        // Va chercher les images souhaité pour la création de la map
         bmGrass1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.img_grass);
         bmGrass1 = Bitmap.createScaledBitmap(bmGrass1, sizeOfMap, sizeOfMap, true);
         bmGrass2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.img_grass03);
@@ -48,6 +73,7 @@ public class GameView extends View {
         bmApple = BitmapFactory.decodeResource(this.getResources(), R.drawable.apple);
         bmApple = Bitmap.createScaledBitmap(bmApple, sizeOfMap, sizeOfMap, true);
 
+        // Création de la map selon la taille de notre écran
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                 if (( i + j ) % 2 == 0) {
@@ -60,6 +86,7 @@ public class GameView extends View {
                 }
             }
         }
+        // Création du snake, de la pomme, du handler et du runnable
         snake = new Snake(bmSnake, arrGrass.get(25).getX(), arrGrass.get(60).getY(), 2);
         apple = new Apple(bmApple, arrGrass.get(randomApple()[0]).getX(), arrGrass.get(randomApple()[1]).getY());
         handler = new Handler();
@@ -71,13 +98,22 @@ public class GameView extends View {
         };
     }
 
+    /**
+     * Méthode appelé pour placer aléatoirement la pomme dans la map
+     *
+     * @return La position x et y de la pomme
+     */
     public int[] randomApple() {
         int[] xy = new int[2];
         Random random = new Random();
+        // Mettre une limite pour pas que la pomme se génère en dehors de l'écran
         xy[0] = random.nextInt(arrGrass.size() - 1);
         xy[1] = random.nextInt(arrGrass.size() - 1);
+        // Création de la position de la pomme
         Rect rect = new Rect(arrGrass.get(xy[0]).getX(), arrGrass.get(xy[1]).getY(), arrGrass.get(xy[0]).getX() + sizeOfMap, arrGrass.get(xy[1]).getY() + sizeOfMap);
+        // Variable de vérification si la pomme à bien àtà générée
         boolean check = true;
+        // Tant que la variable check est à true, on génère la pomme
         while (check) {
             check = false;
             for (int i = 0; i < snake.getArrPartSnake().size(); i++) {
@@ -94,159 +130,52 @@ public class GameView extends View {
     }
 
     /**
-     * Méthode qui fait bouger le snake
+     * Méthode appelé quand on touche l'écran pour faire bouger le snake
      *
-     * @param x valeur de l'accélération selon l'axe X
-     * @param y valeur de l'accélération selon l'axe Y
+     * @param event The motion event.
+     * @return true si l'écran est touché, sinon cela retourne false.
      */
-   /* public static void moveBlock(float x, float y) {
-        // Récupération des dimensions du block
-        snake_height = snake. ( );
-        snake_width = snake.getWidth();
-
-        System.out.println("Snake height : " + snake_height);
-        System.out.println("Snake Width : " + snake_width);
-
-        // Calculer la force
-        float force = (float) Math.sqrt(( x * x ) + ( y * y ));
-
-        // Modifier la puissance de la force
-        force = force / 10;
-
-        // Calculer les nouvelles coordonnées de l'image
-        snakePosX = (int) ( snakePosX - x * force );
-        snakePosY = (int) ( snakePosY + y * force );
-
-        // Vérification que l'image ne sort pas de l'écran
-        // Si elle sort, on la positionne sur l'écran
-        if (snakePosX < 0) {
-            snakePosX = 0;
-        } else if (snakePosX > display_width - snake_width) {
-            snakePosX = display_width - snake_width;
-        }
-        if (snakePosY < 0) {
-            snakePosY = 0;
-        } else if (snakePosY > display_height - snake_height) {
-            snakePosY = display_height - snake_height;
-        }
-        System.out.println("Snake X : " + snakePosX);
-        System.out.println("Snake Y : " + snakePosY);
-
-        // Déplacer l'image
-        snake.setX((float) snakePosX);
-        snake.setY((float) snakePosY);
-    }
-
-    /**
-     * Méthode qui vérifie s'il y a une collision
-     *
-     * @return 0 s'il n'y en a pas, 1 2 3 ou 4 en fonction du côté du mur qui a été touché
-     */
-    /*public static int checkIfCollision() {
-
-        // Récupérer les coordonnées du mur
-        double murX = (int) mur.getX();
-        double murY = (int) mur.getY();
-
-        // Récupérer les dimensions du mur
-        double mur_height = mur.getHeight();
-        double mur_width = mur.getWidth();
-
-        System.out.println("Verif de la col");
-        System.out.println("Mur X : " + murX);
-        System.out.println("Mur Y : " + murY);
-        System.out.println("Mur Height : " + mur_height);
-        System.out.println("Mur Width : " + mur_width);
-
-        // Si l'image touche le mur, la positionner en fonction du côté
-        if (( snakePosX + snake_width >= murX ) && ( snakePosX <= murX + mur_width )) {
-            if (( snakePosY + snake_height >= murY ) && ( snakePosY <= murY + mur_height )) {
-                // Gauche
-                if (snakePosX + snake_width >= murX && snakePosX <= murX) {
-                    System.out.println("Gauche");
-                    return 1;
-                }
-                // Droite
-                if (snakePosX <= murX + mur_width && snakePosX + snake_width >= murX + mur_width) {
-                    System.out.println("Droite");
-                    return 2;
-                }
-                // Haut
-                if (snakePosY + snake_height >= murY && snakePosY <= murY) {
-                    System.out.println("Haut");
-                    return 3;
-                }
-                // Bas
-                if (snakePosY <= murY + mur_height && snakePosY + snake_height >= murY + mur_height) {
-                    System.out.println("Bas");
-                    return 4;
-                }
-            }
-        }*/
-
-    /**
-     * Méthode qui empêche le snake de traverser le mur
-     *
-     * @param //checkResultColision est le côté touché
-     */
-        /*public static void restraintBlock (int checkCollisionResult){
-            switch (checkResultColision) {
-                case 1:
-                    // Gauche
-                    snakePosX = (int) mur.getX() - snake_width - 0.1;
-                    break;
-
-                case 2:
-                    // Droite
-                    snakePosX = (int) mur.getX() + mur.getWidth() + 0.1;
-                    break;
-
-                case 3:
-                    // Haut
-                    snakePosY = (int) mur.getY() - snake_height - 0.1;
-                    break;
-
-                case 4:
-                    // Bas
-                    snakePosY = (int) mur.getY() + mur.getHeight() + 0.1;
-                    break;
-            }
-
-            // Déplacer le snake
-            snake.setX((float) snakePosX);
-            snake.setY((float) snakePosY);
-        }
-        // Aucune collision
-        System.out.println("Pas col");
-        return 0;
-    }*/
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int a = event.getActionMasked();
 
-        switch (a) {
+        int toucheEcran = event.getActionMasked();
+
+        switch (toucheEcran) {
+            // Case si on touche l'écran
             case MotionEvent.ACTION_MOVE: {
+
+                // Vérification si la variable est à faux
                 if (move == false) {
+                    // Alors le mouvement sur l'axe x revient à la position x
                     mx = event.getX();
+                    // Alors le mouvement sur l'axe y revient à la position y
                     my = event.getY();
+                    // Variable de mouvement = true
                     move = true;
                 } else {
+
+                    // Test si le mouvement est à gauche
                     if (mx - event.getX() > 100 * Constants.SCREEN_WIDTH / 1080 && !snake.isMove_right()) {
                         mx = event.getX();
                         my = event.getY();
                         snake.setMove_left(true);
                         isPlaying = true;
+
+                        // Test si le mouvement est à droite
                     } else if (event.getX() - mx > 100 * Constants.SCREEN_WIDTH / 1080 && !snake.isMove_left()) {
                         mx = event.getX();
                         my = event.getY();
                         snake.setMove_right(true);
                         isPlaying = true;
+
+                        // Test si le mouvement est en bas
                     } else if (event.getY() - my > 100 * Constants.SCREEN_WIDTH / 1080 && !snake.ismove_up()) {
                         mx = event.getX();
                         my = event.getY();
                         snake.setmove_down(true);
                         isPlaying = true;
 
+                        // Test si le mouvement est en haut
                     } else if (my - event.getY() > 100 * Constants.SCREEN_WIDTH / 1080 && !snake.ismove_down()) {
                         mx = event.getX();
                         my = event.getY();
@@ -268,39 +197,71 @@ public class GameView extends View {
     }
 
 
+    /**
+     * Méthode appelé pour dessiner les parties du snake, du snake et de la pomme
+     *
+     * @param canvas The Canvas to which the View is rendered.
+     */
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        for (int i = 0; i < arrGrass.size(); i++) {
-            canvas.drawBitmap(arrGrass.get(i).getBitmap(), arrGrass.get(i).getX(),
-                    arrGrass.get(i).getY(), null);
-        }
-        if (isPlaying) {
-            snake.update();
-            if (snake.getArrPartSnake().get(0).getX() < this.arrGrass.get(0).getX()
-                    || snake.getArrPartSnake().get(0).getY() < this.arrGrass.get(0).getY()
-                    || snake.getArrPartSnake().get(0).getY() + sizeOfMap > this.arrGrass.get(this.arrGrass.size() - 1).getY() + sizeOfMap
-                    || snake.getArrPartSnake().get(0).getX() + sizeOfMap > this.arrGrass.get(this.arrGrass.size() - 1).getX() + sizeOfMap) {
-                isPlaying = false;
-                this.reset();
+        // Vérifie si le bouton start est pressé alors on fait ce bout de code
+        if (start) {
+            for (int i = 0; i < arrGrass.size(); i++) {
+                // Dessin de la map
+                canvas.drawBitmap(arrGrass.get(i).getBitmap(), arrGrass.get(i).getX(),
+                        arrGrass.get(i).getY(), null);
             }
-            for (int i = 1; i < snake.getArrPartSnake().size(); i++) {
-                if (snake.getArrPartSnake().get(0).getrBody().intersect(snake.getArrPartSnake().get(i).getrBody())) {
+            // Si le joueur joue
+            if (isPlaying) {
+                // Appel de la méthode update
+                snake.update();
+                // Vérification si le snake à une collision avec les bords de l'éran
+                // Egal game over
+                if (snake.getArrPartSnake().get(0).getX() < this.arrGrass.get(0).getX()
+                        || snake.getArrPartSnake().get(0).getY() < this.arrGrass.get(0).getY()
+                        || snake.getArrPartSnake().get(0).getY() + sizeOfMap > this.arrGrass.get(this.arrGrass.size() - 1).getY() + sizeOfMap
+                        || snake.getArrPartSnake().get(0).getX() + sizeOfMap > this.arrGrass.get(this.arrGrass.size() - 1).getX() + sizeOfMap) {
+                    // Mettre que le jeux est terminé
                     isPlaying = false;
-                    this.reset();
+                    // Rendre l'activité game over à visible
+                    MainActivity.rl_game_over.setVisibility(VISIBLE);
+                }
+                // Regarde si le snake se mort lui même
+                // Egal game over
+                for (int i = 1; i < snake.getArrPartSnake().size(); i++) {
+                    if (snake.getArrPartSnake().get(0).getrBody().intersect(snake.getArrPartSnake().get(i).getrBody())) {
+                        // Mettre que le jeux est terminé
+                        isPlaying = false;
+                        // Rendre l'activité game over à visible
+                        MainActivity.rl_game_over.setVisibility(VISIBLE);
+                    }
                 }
             }
+            // Dessiner le snake
+            snake.drawSnake(canvas);
+            // Dessiner la pomme
+            apple.draw(canvas);
+            // Vérification si le snake mange la pomme
+            // Alors on incrémente le score
+            // On génère une nouvelle pomme dans la map
+            // Et on ajoute une partie du corps au snake = il s'allonge quand il mange une pomme
+            if (snake.getArrPartSnake().get(0).getrBody().intersect(apple.getRect())) {
+                apple.reset(arrGrass.get(randomApple()[0]).getX(), arrGrass.get(randomApple()[1]).getY());
+                snake.addPart();
+                score++;
+                MainActivity.txt_score.setText(score + "");
+            }
+            handler.postDelayed(runnable, 350);
         }
-        snake.drawSnake(canvas);
-        apple.draw(canvas);
-        if (snake.getArrPartSnake().get(0).getrBody().intersect(apple.getRect())) {
-            apple.reset(arrGrass.get(randomApple()[0]).getX(), arrGrass.get(randomApple()[1]).getY());
-            snake.addPart();
-        }
-        handler.postDelayed(runnable, 350);
     }
 
+    /**
+     * Méthode appelé pour remettre le jeux de base à zéro
+     * Si l'on souhaite rejouer
+     */
     public void reset() {
+        // Redessine la map du jeux
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                 if (( j + i ) % 2 == 0) {
@@ -313,7 +274,31 @@ public class GameView extends View {
                 }
             }
         }
+        // Redessine le snake
         snake = new Snake(bmSnake, arrGrass.get(25).getX(), arrGrass.get(60).getY(), 2);
+        // Redessine la pomme
         apple = new Apple(bmApple, arrGrass.get(randomApple()[0]).getX(), arrGrass.get(randomApple()[1]).getY());
+        // Mettre le score à 0
+        score = 0;
+        // Afficher le score à 0
+        MainActivity.txt_score.setText(score + "");
+    }
+
+    /**
+     * Méthode appelé quand le jeux commence
+     *
+     * @return l'état du jeux
+     */
+    public boolean isStart() {
+        return start;
+    }
+
+    /**
+     * Setter du start
+     *
+     * @param start l'état du jeux
+     */
+    public void setStart(boolean start) {
+        this.start = start;
     }
 }
